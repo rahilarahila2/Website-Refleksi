@@ -7,220 +7,152 @@
 </head>
 <body>
 
-<div class="container">
-  <h1>Refleksi Pembelajaran</h1>
+<div class="wrapper">
+
   <div class="progress">
-    <div id="progress-bar"></div>
+    <div id="bar"></div>
   </div>
 
   <form id="form">
 
     <!-- PAGE 1 -->
-    <div class="page active">
-      <h2>Identitas</h2>
+    <section class="step active">
+      <h2>Siapa namamu?</h2>
+      <input type="text" name="nama" placeholder="Ketik di sini..." required autofocus>
 
-      <label>Nama</label>
-      <input type="text" name="nama" required>
+      <h2>Nomor absen?</h2>
+      <input type="number" name="absen" placeholder="Contoh: 12" required>
 
-      <label>No Absen</label>
-      <input type="number" name="absen" required>
-
-      <button type="button" onclick="nextPage()">Lanjut</button>
-    </div>
+      <button type="button" onclick="next()">Lanjut →</button>
+    </section>
 
     <!-- PAGE 2 -->
-    <div class="page">
-      <h2>Pemahaman</h2>
-
-      <label>
-        Jika saya diminta untuk mempresentasikan materi hari ini kepada teman saya, bagian materi apa yang akan saya jelaskan?
-      </label>
-      <textarea name="bagian_dipahami" required></textarea>
+    <section class="step">
+      <h2>
+        Jika kamu harus menjelaskan ke temanmu, bagian apa yang akan kamu jelaskan?
+      </h2>
+      <textarea name="bagian_dipahami" placeholder="Tulis jawabanmu..." required></textarea>
 
       <div class="nav">
-        <button type="button" onclick="prevPage()">Kembali</button>
-        <button type="button" onclick="nextPage()">Lanjut</button>
+        <button type="button" onclick="prev()">←</button>
+        <button type="button" onclick="next()">→</button>
       </div>
-    </div>
+    </section>
 
     <!-- PAGE 3 -->
-    <div class="page">
-      <h2>Kesulitan</h2>
-
-      <label>
-        Bagian mana yang masih sulit saya pahami?
-      </label>
-      <textarea name="kesulitan" required></textarea>
+    <section class="step">
+      <h2>
+        Bagian mana yang masih sulit kamu pahami?
+      </h2>
+      <textarea name="kesulitan" placeholder="Tulis di sini..." required></textarea>
 
       <div class="nav">
-        <button type="button" onclick="prevPage()">Kembali</button>
-        <button type="button" onclick="nextPage()">Lanjut</button>
+        <button type="button" onclick="prev()">←</button>
+        <button type="button" onclick="next()">→</button>
       </div>
-    </div>
+    </section>
 
     <!-- PAGE 4 -->
-    <div class="page">
-      <h2>Komitmen</h2>
-
-      <label>
-        Komitmen apa yang akan saya lakukan untuk mengatasi hal tersebut?
-      </label>
-      <textarea name="komitmen" required></textarea>
+    <section class="step">
+      <h2>
+        Apa komitmenmu untuk mengatasinya?
+      </h2>
+      <textarea name="komitmen" placeholder="Contoh: saya akan latihan soal..." required></textarea>
 
       <div class="nav">
-        <button type="button" onclick="prevPage()">Kembali</button>
-        <button type="submit">Kirim</button>
+        <button type="button" onclick="prev()">←</button>
+        <button type="submit">Kirim ✔</button>
       </div>
-    </div>
+    </section>
 
   </form>
 
   <p id="status"></p>
+
 </div>
 
 <script>
-  let currentPage = 0;
-  const pages = document.querySelectorAll(".page");
-  const progressBar = document.getElementById("progress-bar");
+let step = 0;
+const steps = document.querySelectorAll(".step");
+const bar = document.getElementById("bar");
 
-  function showPage(index) {
-    pages.forEach(p => p.classList.remove("active"));
-    pages[index].classList.add("active");
+function showStep(i) {
+  steps.forEach(s => s.classList.remove("active"));
+  steps[i].classList.add("active");
 
-    let progress = ((index + 1) / pages.length) * 100;
-    progressBar.style.width = progress + "%";
-  }
+  let progress = ((i + 1) / steps.length) * 100;
+  bar.style.width = progress + "%";
 
-  function nextPage() {
-    if (currentPage < pages.length - 1) {
-      currentPage++;
-      showPage(currentPage);
+  // autofocus otomatis
+  const input = steps[i].querySelector("input, textarea");
+  if (input) input.focus();
+}
+
+function validateStep() {
+  const inputs = steps[step].querySelectorAll("input, textarea");
+  for (let input of inputs) {
+    if (!input.value.trim()) {
+      input.style.border = "2px solid red";
+      return false;
+    } else {
+      input.style.border = "1px solid #ccc";
     }
   }
+  return true;
+}
 
-  function prevPage() {
-    if (currentPage > 0) {
-      currentPage--;
-      showPage(currentPage);
-    }
+function next() {
+  if (!validateStep()) return;
+
+  if (step < steps.length - 1) {
+    step++;
+    showStep(step);
   }
+}
 
-  // Submit ke Google Sheets
-  const form = document.getElementById("form");
-  const status = document.getElementById("status");
+function prev() {
+  if (step > 0) {
+    step--;
+    showStep(step);
+  }
+}
 
-  form.addEventListener("submit", function(e) {
+// Enter untuk lanjut
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && step < steps.length - 1) {
     e.preventDefault();
+    next();
+  }
+});
 
-    const data = new FormData(form);
+// submit
+const form = document.getElementById("form");
+const status = document.getElementById("status");
 
-    fetch("YOUR_GOOGLE_SCRIPT_URL", {
-      method: "POST",
-      body: data
-    })
-    .then(() => {
-      status.innerText = "Jawaban berhasil dikirim!";
-      form.reset();
-      currentPage = 0;
-      showPage(currentPage);
-    })
-    .catch(() => {
-      status.innerText = "Terjadi kesalahan.";
-    });
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  if (!validateStep()) return;
+
+  const data = new FormData(form);
+
+  fetch("YOUR_GOOGLE_SCRIPT_URL", {
+    method: "POST",
+    body: data
+  })
+  .then(() => {
+    status.innerText = "Jawaban terkirim 🎉";
+    form.reset();
+    step = 0;
+    showStep(step);
+  })
+  .catch(() => {
+    status.innerText = "Gagal mengirim.";
   });
+});
 
-  showPage(currentPage);
+showStep(step);
 </script>
 
 </body>
 </html>
-
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #6dd5ed, #2193b0);
-  margin: 0;
-}
-
-.container {
-  max-width: 600px;
-  background: white;
-  margin: 50px auto;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-h1 {
-  text-align: center;
-}
-
-h2 {
-  margin-bottom: 10px;
-}
-
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-label {
-  display: block;
-  margin-top: 15px;
-  font-weight: 600;
-}
-
-input, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-textarea {
-  height: 120px;
-}
-
-button {
-  margin-top: 20px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  background: #2193b0;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #176d82;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-between;
-}
-
-.progress {
-  width: 100%;
-  height: 8px;
-  background: #eee;
-  border-radius: 10px;
-  margin: 20px 0;
-}
-
-#progress-bar {
-  height: 100%;
-  width: 0%;
-  background: #2193b0;
-  border-radius: 10px;
-  transition: 0.3s;
-}
-
-#status {
-  text-align: center;
-  margin-top: 15px;
-  font-weight: bold;
-}
