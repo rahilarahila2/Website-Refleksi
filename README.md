@@ -134,3 +134,93 @@
 
 </body>
 </html>
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #6dd5ed, #2193b0);
+  margin: 0;
+}
+
+.container {
+  max-width: 600px;
+  background: white;
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  height: 120px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background: #2193b0;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #176d82;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress {
+  width: 100%;
+  height: 8px;
+  background: #eee;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #2193b0;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+#status {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+}
