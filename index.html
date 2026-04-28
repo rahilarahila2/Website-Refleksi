@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Refleksi Pembelajaran</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
+  margin: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 60px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.step {
+  display: none;
+}
+
+h2, h3 {
+  margin-bottom: 10px;
+}
+
+p {
+  line-height: 1.5;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+textarea {
+  height: 100px;
+  resize: none;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #4facfe;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #3a8dde;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <form id="form">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <h2>Identitas</h2>
+      <input id="nama" placeholder="Nama" required>
+      <input id="absen" placeholder="Nomor Absen" required>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <h3>Pertanyaan 1</h3>
+      <p>
+        Diketahui hubungan antara modal dan keuntungan suatu usaha mengikuti persamaan regresi linear:<br>
+        <b>y = 4 + 1,3x</b><br><br>
+        Tentukan perkiraan keuntungan jika modal sebesar <b>6 juta</b> dan <b>18 juta</b>!
+      </p>
+      <textarea id="q1" placeholder="Tulis jawabanmu di sini..."></textarea>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <h3>Pertanyaan 2</h3>
+      <p>Bagian apa yang paling saya pahami?</p>
+      <textarea id="q2" placeholder="Tulis jawabanmu di sini..."></textarea>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <h3>Pertanyaan 3</h3>
+      <p>Bagian mana yang masih sulit saya pahami?</p>
+      <textarea id="q3" placeholder="Tulis jawabanmu di sini..."></textarea>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <h3>Pertanyaan 4</h3>
+      <p>Kegiatan pembelajaran seperti apa yang saya senangi untuk belajar matematika di kelas?</p>
+      <textarea id="q4" placeholder="Tulis jawabanmu di sini..."></textarea>
+    </div>
+
+    <button type="button" id="next">Next</button>
+
+  </form>
+</div>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbwxdjRG-gMchUtCArxHkdiK2AhutNTctX91XIfuLxqVBbEMH-3LBiHXXesOz4moySLemA/exec"; // GANTI DENGAN URL APPS SCRIPT
+
+const steps = document.querySelectorAll(".step");
+const btn = document.getElementById("next");
+
+let current = 0;
+
+// tampilkan step
+function showStep(index) {
+  steps.forEach((step, i) => {
+    step.style.display = (i === index) ? "block" : "none";
+  });
+
+  if (index === steps.length - 1) {
+    btn.textContent = "Submit";
+  } else {
+    btn.textContent = "Next";
+  }
+}
+
+// validasi input
+function validate(index){
+  const inputs = steps[index].querySelectorAll("input, textarea");
+  for (let el of inputs) {
+    if (el.value.trim() === "") {
+      alert("Harap isi terlebih dahulu!");
+      return false;
+    }
+  }
+  return true;
+}
+
+// tombol next / submit
+btn.addEventListener("click", async () => {
+
+  if (!validate(current)) return;
+
+  if (current < steps.length - 1) {
+    current++;
+    showStep(current);
+  } else {
+
+    const data = {
+      nama: document.getElementById("nama").value,
+      absen: document.getElementById("absen").value,
+      q1: document.getElementById("q1").value,
+      q2: document.getElementById("q2").value,
+      q3: document.getElementById("q3").value,
+      q4: document.getElementById("q4").value
+    };
+
+    try {
+      await fetch(scriptURL, {
+  method: "POST",
+  mode: "no-cors", // PENTING
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(data)
+});
+
+      alert("Jawaban berhasil dikirim!");
+      location.reload();
+
+    } catch (err) {
+      alert("Gagal mengirim data!");
+      console.error(err);
+    }
+  }
+});
+
+// mulai dari step pertama
+showStep(0);
+</script>
+
+</body>
+</html>
